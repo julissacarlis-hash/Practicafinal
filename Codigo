@@ -1,0 +1,276 @@
+using System.Globalization;
+using System.IO.Pipes;
+using System.Reflection.Metadata.Ecma335;
+namespace proyectofinal2
+{
+
+    internal class Program
+    {
+       
+
+        static void Main(string[] args)
+        {
+            /* Segundo paso, asignarle una lista con el bucle for para que el usuario pueda ingrsar la cantidad de pacientes que quiera*/
+             List<DatosdePacientes> Paciente = new List<DatosdePacientes>();
+            Console.Write("Cuantas personas deseas registrar?");
+            int cantidad = int.Parse(Console.ReadLine());
+            Console.WriteLine("Ingrese datos del paciente");
+
+            for (int i = 0; i < cantidad; i++)
+            {
+
+                DatosdePacientes p = new DatosdePacientes();
+                Console.WriteLine($"\n--- Paciente {i } ---");
+                Console.WriteLine("ID:(Sin Guiones)");
+                p.ID = int.Parse(Console.ReadLine());
+                Console.WriteLine("Name:");
+                p.Name = (Console.ReadLine());
+                Console.WriteLine("Edad:");
+                p.Edad = int.Parse(Console.ReadLine());
+                Console.WriteLine("Sexo:");
+                p.sexo = Convert.ToChar(Console.ReadLine());
+                Console.WriteLine("Diagnostico:");
+                p.Diagnostico = (Console.ReadLine());
+                Console.WriteLine("Fecha de ingreso (dd/mm/aaaa)");
+                DateTime fechaValida;
+                while(!DateTime.TryParseExact(Console.ReadLine(),
+                    "dd/mm/yyyy",
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out fechaValida))
+                {
+                    Console.Write("Formato Incorrecto,intenta de nuevo (dd/mm/aaaa)");
+                }
+                 p.fecha= fechaValida;
+                Paciente.Add(p);
+
+
+
+            }
+            
+           Gestordepaciente p1 = new Gestordepaciente(Paciente);
+            p1.Menu();
+        }
+    }
+    /* Mi primer paso, darle valor a los atributos */
+    public class DatosdePacientes
+    {
+        public int ID;
+        public string Name;
+        public int Edad;
+        public char sexo;
+        public string Diagnostico;
+        public DateTime fecha;
+
+    }
+    /* tercer paso, llamar la lista mediante un metodo y despues guardarlo en uno nuevo llamado listarecibida
+     * para poder usar los datos ingresado por el usuario en una clase diferente*/
+    /* ademas aqui cree mi menu principal */
+    public class Gestordepaciente
+    {
+        List<DatosdePacientes> Paciente;
+        public Gestordepaciente(List<DatosdePacientes> listarecibida)
+        {
+            Paciente=listarecibida;
+        }
+        
+        public void Menu()
+        {
+            bool salir = false;
+           
+            while (!salir)
+            {
+                Console.WriteLine("\n==== MENU PRINCIPAL ====");
+                Console.WriteLine("1.Crear Persona");
+                Console.WriteLine("2.Mostrar Lista");
+                Console.WriteLine("3.Actualizar persona");
+                Console.WriteLine("4.Eliminar Persona");
+                Console.WriteLine("5.Salir");
+                Console.Write("Selecciona una opcion");
+                String opcion = Console.ReadLine();
+
+                switch (opcion)
+                {
+
+                    case "1":
+                        string respuesta;
+                        do
+                        {
+                            Crear();
+                            Console.WriteLine("Desea repetir la operacion? S/N");
+                            respuesta = Console.ReadLine();
+                        } while (respuesta.ToUpper() == "S");
+                        break;
+                    case "2":
+                        do
+                        {
+                            Mostrar();
+                            Console.WriteLine("Desea repetir la operacion? S/N");
+                            respuesta = Console.ReadLine();
+                        } while (respuesta.ToUpper() == "S");
+                      
+                        break;
+                    case "3":
+                        do
+                        {
+                            Actualizar();
+                            Console.WriteLine("Desea repetir la operacion? S/N");
+                            respuesta = Console.ReadLine();
+                        } while (respuesta.ToUpper() == "S");
+                        break;
+                    case "4":
+                        do
+                        {
+                            Eliminar();
+                            Console.WriteLine("Desea repetir la operacion? S/N");
+                            respuesta = Console.ReadLine();
+                        } while (respuesta.ToUpper() == "S");
+
+                        break;
+                    case "5":
+                        salir = true;
+                        Console.WriteLine("Saliendo del programa S/N");
+                        break;
+                }
+            }
+        }
+        /* Aqui cree los metodos que harian que el menu funcionara*/
+        public void Crear()
+        {
+           
+            DatosdePacientes crear = new DatosdePacientes();
+            Console.WriteLine("ID:");
+            crear.ID = int.Parse(Console.ReadLine());
+            Console.WriteLine("Name:");
+            crear.Name = (Console.ReadLine());
+            Console.WriteLine("Edad:");
+            crear.Edad = int.Parse(Console.ReadLine());
+            Console.WriteLine("Sexo:");
+            crear.sexo = Convert.ToChar(Console.ReadLine());
+            Console.WriteLine("Diagnostico:");
+            crear.Diagnostico = (Console.ReadLine());
+            Console.WriteLine("Fecha de ingreso dd/mm/aaaa");
+            DateTime fechaValida;
+            while (!DateTime.TryParseExact(Console.ReadLine(),
+                "dd/mm/yyyy",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out fechaValida))
+            {
+                Console.Write("Formato Incorrecto,intenta de nuevo (dd/mm/aaaa)");
+            }
+            crear.fecha = fechaValida;
+            Paciente.Add(crear);
+          
+        
+            
+        }
+        public void Mostrar() {
+            Console.WriteLine("\n=== Lista de Pacientes ===");
+            if (Paciente.Count == 0)
+            {
+                Console.WriteLine("No hay pacientes registrados");
+                return;
+            }
+            for (int i= 0; i< Paciente.Count; i++)
+            {
+                Console.WriteLine($" Paciente numero: {i }. \n" + "/n" +
+                    $"ID: {Paciente[i].ID}. \n" +
+                    $"Name: {Paciente[i].Name}. \n" +
+                    $"Edad: {Paciente[i].Edad} \n" +
+                    $"Sexo: {Paciente[i].sexo} \n" +
+                    $"Diagnostico: {Paciente[i].Diagnostico} \n" +
+                    $"Fecha de ingreso: {Paciente[i].fecha}");
+            }
+
+            
+        
+        }
+        public void Actualizar (){
+            Mostrar();
+            if (Paciente.Count ==0) return;
+            Console.Write("Que numero de pacientes deseas seleccionar?");
+            int NumerodePaciente = int.Parse(Console.ReadLine());
+            if (NumerodePaciente < 0 || NumerodePaciente >= Paciente.Count)
+            {
+                Console.WriteLine("el paciente no existe");
+                return;
+            }
+            Console.WriteLine("Desea ingresar un nuevo ID? S/N");
+            string valid = (Console.ReadLine());
+            if (valid.ToUpper() == "S") {
+                Console.WriteLine("Ingrese el nuevo ID (Sin guiones)");
+                Paciente[NumerodePaciente].ID = int.Parse(Console.ReadLine());
+            }
+            Console.WriteLine("Desea ingresar un nuevo Nombre? S/N");
+            valid = Console.ReadLine();
+            if (valid.ToUpper() == "S") {
+                Console.WriteLine("Ingrese el nuevo nombre");
+                Paciente[NumerodePaciente].Name =(Console.ReadLine());
+
+            }
+            Console.WriteLine("Desea ingresar una nueva Edad? S/N");
+            valid = Console.ReadLine();
+            if (valid.ToUpper() == "S")
+            {
+                Console.WriteLine("Ingrese la nuevo edad");
+                Paciente[NumerodePaciente].Edad = int.Parse(Console.ReadLine());
+
+            }
+            Console.WriteLine("Desea ingresar un nuevo Sexo? S/N");
+            valid = Console.ReadLine();
+            if (valid.ToUpper() == "S")
+            {
+                Console.WriteLine("Ingrese el nuevo sexo");
+                Paciente[NumerodePaciente].sexo = Convert.ToChar(Console.ReadLine());
+
+            }
+            Console.WriteLine("Desea ingresar un nuevo Diagnostico? S/N");
+            valid = Console.ReadLine();
+            if (valid.ToUpper() == "S")
+            {
+                Console.WriteLine("Ingrese el nuevo diagnostico");
+                Paciente[NumerodePaciente].Diagnostico = (Console.ReadLine());
+
+            }
+            Console.WriteLine("Desea ingresar una nueva fecha de Ingreso? S/N");
+            valid = Console.ReadLine();
+            if (valid.ToUpper() == "S")
+            {
+                Console.WriteLine("Ingrese la nueva fecha ddd/mm/aaaa");
+                DateTime fechaValida;
+                while (!DateTime.TryParseExact(Console.ReadLine(),
+                    "dd/mm/yyyy",
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out fechaValida))
+                {
+                    Console.Write("Formato Incorrecto,intenta de nuevo (dd/mm/aaaa)");
+                }
+                Paciente[NumerodePaciente].fecha = fechaValida;
+
+            }
+
+
+        }
+        public void Eliminar()
+        {
+            Mostrar();
+            if (Paciente.Count == 0) return;
+            Console.Write("Que numero de paciente deseas eliminar");
+            int NumerodePacientes = int.Parse(Console.ReadLine());
+            if (NumerodePacientes < 0 || NumerodePacientes >= Paciente.Count)
+            {
+                Console.WriteLine("el paciente no existe");
+                return;
+            }
+            Paciente.RemoveAt(NumerodePacientes);
+            Console.WriteLine("Paciente eliminado correctamente");
+
+
+        }
+    }
+       
+    
+}
+
